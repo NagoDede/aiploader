@@ -12,19 +12,19 @@ type AipDocument struct {
 	EffectiveDate     time.Time
 	PublicationDate   time.Time
 	NextEffectiveDate time.Time
-	ProcessDate       time.Time		
+	ProcessDate       time.Time
 	IsValidDate       bool
 	PartialURL        string
 	IsPartialURLValid bool
 	FullURLDir        string
 	FullURLPage       string
 	Airports          []Airport
-	Navaids			  []Navaid
+	Navaids           []Navaid
 	CountryCode       string
 }
 
 type IAipDocument interface {
-	LoadAirports(cl *http.Client) 
+	LoadAirports(cl *http.Client)
 	GetNavaids(cl *http.Client) []Navaid
 	DownloadAllAiportsData(client *http.Client)
 	DownloadAllAiportsHtmlPage(cl *http.Client)
@@ -41,12 +41,11 @@ func (aip *AipDocument) DirMainDownload() string {
 }
 
 func (aip *AipDocument) DirMergeFiles() string {
-	return filepath.Join(aip.DirMainDownload(), ConfData.MergeDir)
+	//return filepath.Join(aip.DirMainDownload(), ConfData.MergeDir)
+	dir := filepath.Join(ConfData.MainLocalDir, aip.CountryCode)
+	return filepath.Join(dir, ConfData.MergeDir)
 }
 
 func (aip *AipDocument) Document() AipDocument {
 	return *aip
 }
-
-
-

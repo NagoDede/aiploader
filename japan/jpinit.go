@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 	"time"
-
+	"path/filepath"
 	"golang.org/x/net/publicsuffix"
 )
 
@@ -122,7 +122,9 @@ func (jpd *JpData) Process() {
 	if err != nil {
 		log.Println(err)
 	}
-	_ = ioutil.WriteFile("info.json", jsonData, 0644)
+	
+	var infoPath = filepath.Join(activeAipDoc.DirMergeFiles(),"info.json")
+	_ = ioutil.WriteFile(infoPath, jsonData, 0644)
 }
 
 /**
