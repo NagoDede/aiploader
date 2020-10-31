@@ -39,6 +39,16 @@ jobs:
          JAPAN_AIP_PWD: ${{ secrets.JAPAN_AIP_PWD }}
          JAPAN_AIP_USERID: ${{secrets.JAPAN_AIP_USERID }}
       run: ./aiploader
-      
-    - name: Test
-      run: go test -v .
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+          personal_token: ${{ secrets.TOKEN }}
+          external_repository: NagoDede/nagodede.github.io
+          destination_dir: /aip/japan/documents
+          publish_dir: //tmp/AipPages/Japan/merge
+          #   keep_files: true
+          user_name: NagoDede
+          user_email: nagoydede@yahoo.com
+          publish_branch: master
+        #   cname: example.com
