@@ -45,7 +45,7 @@ jobs:
       with:
           personal_token: ${{ secrets.TOKEN }}
           external_repository: NagoDede/nagodede.github.io
-          destination_dir: /aip/japan/documents
+          destination_dir: ./aip/japan/documents
           publish_dir: //tmp/AipPages/Japan/merge
           #   keep_files: true
           user_name: NagoDede
