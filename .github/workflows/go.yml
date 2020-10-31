@@ -12,7 +12,11 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-
+    - shell: bash
+      env:
+         JAPAN_AIP_PWD: ${{ secrets.JAPAN_AIP_PWD }}
+         JAPAN_AIP_USERID: ${{secrets.JAPAN_AIP_USERID }}
+         
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
@@ -32,5 +36,8 @@ jobs:
     - name: Build
       run: go build -v .
 
+    - name: Execute
+      run: ./aiploader
+      
     - name: Test
       run: go test -v .
