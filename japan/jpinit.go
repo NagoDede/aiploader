@@ -9,25 +9,30 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
-	"path/filepath"
+
 	"golang.org/x/net/publicsuffix"
 )
 
 var JapanAis JpData
 
 type JpLoginFormData struct {
-	FormName string `json:"formName"`
-	Password string `json:"password"`
-	UserID   string `json:"userID"`
+	FormName   string `json:"formName"`
+	PasswordIn string `json:"password"`
+	UserIDIn   string `json:"userID"`
+	Password   string `json:"-"`
+	UserID     string `json:"-"`
 }
 
 type JpData struct {
 	MainDataConfig
-	LoginData        JpLoginFormData `json:"loginData"`
-	LoginPage        string          `json:"loginPage"`
-	AipIndexPageName string
+	LoginData            JpLoginFormData `json:"loginData"`
+	LoginPage            string          `json:"loginPage"`
+	AipIndexPageName     string
+	NextEffectiveDateStr string    `json:"nextDate"`
+	NextEffectiveDate    time.Time `json:"-"`
 }
 
 type MainDataConfig struct {
@@ -66,26 +71,44 @@ func (jpd *JpData) LoadJsonFile(path string) {
 		fmt.Println("error:", err)
 	}
 
+	//parse  the date
+	if jpd.NextEffectiveDateStr == "" {
+		today := time.Now()
+		jpd.NextEffectiveDateStr = today.Format("02/01/2006")
+		jpd.NextEffectiveDate = today
+	} else {
+		nextDate, err := time.Parse("02/01/2006", jpd.NextEffectiveDateStr)
+		jpd.NextEffectiveDate = nextDate
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	fmt.Printf("Expect Next Active Document: %s",jpd.NextEffectiveDate.Format("02-Jan-2006") )
+
 	//The password may be provided by an environment variable
-	if strings.HasPrefix(jpd.LoginData.Password, "Env:") {
-		var s = strings.TrimPrefix(jpd.LoginData.Password, "Env:")
+	if strings.HasPrefix(jpd.LoginData.PasswordIn, "Env:") {
+		var s = strings.TrimPrefix(jpd.LoginData.PasswordIn, "Env:")
 		s = strings.TrimSpace(s)
 		jpd.LoginData.Password = os.Getenv(s)
 
 		if jpd.LoginData.Password == "" {
 			panic(fmt.Sprintf("Password Environment variable: %s  not defined\n", s))
 		}
+	} else {
+		jpd.LoginData.Password = jpd.LoginData.PasswordIn
 	}
 
 	//The UserID may be provided by an environment variable
-	if strings.HasPrefix(jpd.LoginData.UserID, "Env:") {
-		var s = strings.TrimPrefix(jpd.LoginData.UserID, "Env:")
+	if strings.HasPrefix(jpd.LoginData.UserIDIn, "Env:") {
+		var s = strings.TrimPrefix(jpd.LoginData.UserIDIn, "Env:")
 		s = strings.TrimSpace(s)
 		jpd.LoginData.UserID = os.Getenv(s)
 
 		if jpd.LoginData.UserID == "" {
 			panic(fmt.Sprintf("User ID Environment variable: %s  not defined\n", s))
 		}
+	} 	else 	{
+		jpd.LoginData.UserID = jpd.LoginData.UserIDIn
 	}
 }
 
@@ -101,30 +124,47 @@ func (jpd *JpData) Process() {
 	activeAipDoc := aipDocsList.getActiveAipDoc()
 	activeAipDoc.NextEffectiveDate = aipDocsList.GetNextDate(*activeAipDoc)
 	activeAipDoc.CountryCode = jpd.CountryDir
-	activeAipDoc.ProcessDate = time.Now()
-	fmt.Println("Active Document Effective Date:" + activeAipDoc.EffectiveDate.Format("02-Jan-2006") +
-		" Publication Date: " + activeAipDoc.PublicationDate.Format("02-Jan-2006"))
-	fmt.Println("   " + activeAipDoc.FullURLDir)
+	today := time.Now()
+	activeAipDoc.ProcessDate = today
 
-	fmt.Println("Retrieve the Navaids List")
-	activeAipDoc.GetNavaids(&client)
+	if today.After(jpd.NextEffectiveDate) {
 
-	fmt.Println("Retrieve the Airports List")
-	activeAipDoc.LoadAirports(&client)
-	//activeAipDoc.DownloadAllAiportsHtmlPage(&client)
-	fmt.Println("Number of identified airports: ")
+		fmt.Println("Active Document Effective Date:" + activeAipDoc.EffectiveDate.Format("02-Jan-2006") +
+			" Publication Date: " + activeAipDoc.PublicationDate.Format("02-Jan-2006"))
+		fmt.Println("   " + activeAipDoc.FullURLDir)
 
-	fmt.Println("Download the Airports Data")
-	activeAipDoc.DownloadAllAiportsData(&client)
+		//save the next date
+		jpd.NextEffectiveDate = activeAipDoc.NextEffectiveDate
+		jpd.NextEffectiveDateStr = jpd.NextEffectiveDate.Format("02/01/2006")
 
-	//write the report JSON file
-	jsonData, err := json.MarshalIndent(activeAipDoc, "", " ")
-	if err != nil {
-		log.Println(err)
+		jpData, err := json.MarshalIndent(jpd, "", " ")
+		if err != nil {
+			log.Println(err)
+		}
+		_ = ioutil.WriteFile("japan.json", jpData, 0644)
+
+		fmt.Println("Retrieve the Navaids List")
+		activeAipDoc.GetNavaids(&client)
+
+		fmt.Println("Retrieve the Airports List")
+		activeAipDoc.LoadAirports(&client)
+		//activeAipDoc.DownloadAllAiportsHtmlPage(&client)
+		fmt.Println("Number of identified airports: ")
+
+		fmt.Println("Download the Airports Data")
+		activeAipDoc.DownloadAllAiportsData(&client)
+
+		//write the report JSON file
+		jsonData, err := json.MarshalIndent(activeAipDoc, "", " ")
+		if err != nil {
+			log.Println(err)
+		}
+
+		var infoPath = filepath.Join(activeAipDoc.DirMergeFiles(), "info.json")
+		_ = ioutil.WriteFile(infoPath, jsonData, 0644)
+	} else {
+		fmt.Printf("No need to run. Current date %s - next date %s", today.Format("02-Jan-2006"), jpd.NextEffectiveDate.Format("02-Jan-2006"))
 	}
-	
-	var infoPath = filepath.Join(activeAipDoc.DirMergeFiles(),"info.json")
-	_ = ioutil.WriteFile(infoPath, jsonData, 0644)
 }
 
 /**

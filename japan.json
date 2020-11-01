@@ -1,12 +1,13 @@
-{"loginData": 	
-    {
-    "formName": "ais-web",
-    "password": "Env: JAPAN_AIP_PWD",
-    "userID":   "Env:JAPAN_AIP_USERID"
-    },
-"loginPage": "https://aisjapan.mlit.go.jp/LoginAction.do",
-"mainAipPage": "https://aisjapan.mlit.go.jp/html/AIP/html/DomesticAIP.do",
-"mainAipActiveURL": "https://aisjapan.mlit.go.jp/html/AIP/html/",
-"countryDir": "Japan",
-"aipIndexPageName":  "JP-menu-en-JP.html"
+{
+ "countryDir": "Japan",
+ "MainAipPage": "https://aisjapan.mlit.go.jp/html/AIP/html/DomesticAIP.do",
+ "MainAipActiveURL": "https://aisjapan.mlit.go.jp/html/AIP/html/",
+ "loginData": {
+  "formName": "ais-web",
+  "password": "Env: JAPAN_AIP_PWD",
+  "userID":   "Env:JAPAN_AIP_USERID"
+ },
+ "loginPage": "https://aisjapan.mlit.go.jp/LoginAction.do",
+ "AipIndexPageName": "JP-menu-en-JP.html",
+ "nextDate": ""
 }
