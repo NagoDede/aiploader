@@ -39,6 +39,18 @@ jobs:
          JAPAN_AIP_PWD: ${{ secrets.JAPAN_AIP_PWD }}
          JAPAN_AIP_USERID: ${{secrets.JAPAN_AIP_USERID }}
       run: ./aiploader
+      
+    - name: Commit files
+      run: |
+        git config --local user.email "nagodede@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Add changes" -a
+        
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
@@ -46,7 +58,7 @@ jobs:
           personal_token: ${{ secrets.TOKEN }}
           external_repository: NagoDede/nagodede.github.io
           destination_dir: ./aip/japan/documents
-          publish_dir: //tmp/AipPages/Japan/20201008/merge
+          publish_dir: //tmp/AipPages/Japan/merge
           #   keep_files: true
           user_name: NagoDede
           user_email: nagoydede@yahoo.com
