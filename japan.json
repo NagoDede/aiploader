@@ -5,9 +5,9 @@
  "loginData": {
   "formName": "ais-web",
   "password": "Env: JAPAN_AIP_PWD",
-  "userID":   "Env:JAPAN_AIP_USERID"
+  "userID": "Env:JAPAN_AIP_USERID"
  },
  "loginPage": "https://aisjapan.mlit.go.jp/LoginAction.do",
  "AipIndexPageName": "JP-menu-en-JP.html",
- "nextDate": ""
+ "nextDate": "05/11/2020"
 }
