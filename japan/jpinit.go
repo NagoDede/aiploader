@@ -83,7 +83,7 @@ func (jpd *JpData) LoadJsonFile(path string) {
 			log.Fatal(err)
 		}
 	}
-	fmt.Printf("Expect Next Active Document: %s",jpd.NextEffectiveDate.Format("02-Jan-2006") )
+	fmt.Printf("Expect Next Active Document: %s", jpd.NextEffectiveDate.Format("02-Jan-2006"))
 
 	//The password may be provided by an environment variable
 	if strings.HasPrefix(jpd.LoginData.PasswordIn, "Env:") {
@@ -107,7 +107,7 @@ func (jpd *JpData) LoadJsonFile(path string) {
 		if jpd.LoginData.UserID == "" {
 			panic(fmt.Sprintf("User ID Environment variable: %s  not defined\n", s))
 		}
-	} 	else 	{
+	} else {
 		jpd.LoginData.UserID = jpd.LoginData.UserIDIn
 	}
 }
@@ -133,16 +133,6 @@ func (jpd *JpData) Process() {
 			" Publication Date: " + activeAipDoc.PublicationDate.Format("02-Jan-2006"))
 		fmt.Println("   " + activeAipDoc.FullURLDir)
 
-		//save the next date
-		jpd.NextEffectiveDate = activeAipDoc.NextEffectiveDate
-		jpd.NextEffectiveDateStr = jpd.NextEffectiveDate.Format("02/01/2006")
-
-		jpData, err := json.MarshalIndent(jpd, "", " ")
-		if err != nil {
-			log.Println(err)
-		}
-		_ = ioutil.WriteFile("japan.json", jpData, 0644)
-
 		fmt.Println("Retrieve the Navaids List")
 		activeAipDoc.GetNavaids(&client)
 
@@ -162,6 +152,17 @@ func (jpd *JpData) Process() {
 
 		var infoPath = filepath.Join(activeAipDoc.DirMergeFiles(), "info.json")
 		_ = ioutil.WriteFile(infoPath, jsonData, 0644)
+
+		//save the next date in the json file
+		jpd.NextEffectiveDate = activeAipDoc.NextEffectiveDate
+		jpd.NextEffectiveDateStr = jpd.NextEffectiveDate.Format("02/01/2006")
+
+		jpData, err := json.MarshalIndent(jpd, "", " ")
+		if err != nil {
+			log.Println(err)
+		}
+		_ = ioutil.WriteFile("japan.json", jpData, 0644)
+
 	} else {
 		fmt.Printf("No need to run. Current date %s - next date %s", today.Format("02-Jan-2006"), jpd.NextEffectiveDate.Format("02-Jan-2006"))
 	}
