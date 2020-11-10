@@ -33,6 +33,7 @@ jobs:
         git config --local user.email "nagodede@github.com"
         git config --local user.name "GitHub Action"
         git commit --allow-empty -m "Update AIPs" -a
+        git pull
         
     - name: Push changes
       uses: ad-m/github-push-action@master
