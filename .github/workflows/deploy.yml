@@ -32,6 +32,7 @@ jobs:
       run: |
         git config --local user.email "nagodede@github.com"
         git config --local user.name "GitHub Action"
+        git add .
         git commit --allow-empty -m "Update AIPs" -a
         
     - name: Push changes
