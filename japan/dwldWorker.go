@@ -93,12 +93,12 @@ func DownloadAndMergeAiportData(apt *generic.Airport, jobs *chan *generic.PdfDat
 	//But it provides a complementary means of verification$
 	//Merge only if there is more than one file.
 	if apt.DetermmineIsDownloaded() {
-		fmt.Println("Airport: " + apt.Icao + " all docs downloaded confirmed.")
+		fmt.Println("Airport: " + apt.Icao + " all docs downloaded confirmed")
 		if len(apt.PdfData) > 1 {
 			fmt.Printf("     Airport: %s merging files (%d). \n", apt.Icao, len(apt.PdfData))
 			err := MergePdfDataOfAiport(apt)
 			if err != nil {
-				fmt.Println("     Problem on Airport: %s download again. \n", apt.Icao)
+				fmt.Println("     Problem on Airport: %s download again \n", apt.Icao)
 				DownloadAndMergeAiportData(apt, jobs, docWg, true)
 			} else {
 				//All the airport downloads and merge have been done. The airport can be remove of the waiting group
@@ -111,7 +111,7 @@ func DownloadAndMergeAiportData(apt *generic.Airport, jobs *chan *generic.PdfDat
 			opth := filepath.Join(outFullMerge.FileDirectory, outFullMerge.FileName)
 			_, err := Copy(apt.PdfData[0].FilePath, opth)
 			if err != nil {
-				fmt.Println("     Problem with Airport: %s unable to copy in %s. \n", apt.Icao, opth)
+				fmt.Printf("     Problem with Airport: %s unable to copy in %s \n", apt.Icao, opth)
 				fmt.Println("       Download file(s) again")
 				DownloadAndMergeAiportData(apt, jobs, docWg, true)
 			} else {
