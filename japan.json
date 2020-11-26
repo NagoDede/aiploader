@@ -9,6 +9,10 @@
  },
  "loginPage": "https://aisjapan.mlit.go.jp/LoginAction.do",
  "AipIndexPageName": "JP-menu-en-JP.html",
+<<<<<<< HEAD
  "LocationCodePage": "JP-GEN-2.4-en-JP.html",
  "nextDate": "05/09/2020"
+=======
+ "nextDate": "03/12/2020"
+>>>>>>> 8b95f00a7083409d8fa7f514a9351811af0a5738
 }
