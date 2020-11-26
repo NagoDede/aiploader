@@ -3,11 +3,12 @@
  "MainAipPage": "https://aisjapan.mlit.go.jp/html/AIP/html/DomesticAIP.do",
  "MainAipActiveURL": "https://aisjapan.mlit.go.jp/html/AIP/html/",
  "loginData": {
-  "formName": "ais-web",
   "password": "Env: JAPAN_AIP_PWD",
-  "userID": "Env:JAPAN_AIP_USERID"
+  "userID": "Env:JAPAN_AIP_USERID",
+  "formName": "ais-web"
  },
  "loginPage": "https://aisjapan.mlit.go.jp/LoginAction.do",
  "AipIndexPageName": "JP-menu-en-JP.html",
+ "LocationCodePage": "JP-GEN-2.4-en-JP.html",
  "nextDate": "05/09/2020"
 }

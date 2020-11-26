@@ -7,13 +7,13 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/NagoDede/aiploader/generic"
+	"github.com/PuerkitoBio/goquery"
 )
 
 type JpAipDocument struct {
 	generic.AipDocument
-	Airports          []JpAirport
+	Airports []JpAirport
 }
 
 func (aipdcs *JpAipDocument) GetNavaids(cl *http.Client) []generic.Navaid {
@@ -105,6 +105,45 @@ func loadNavaidsFromHtmlDoc(navaidsdoc *goquery.Document) (map[string]generic.Na
 	return navs, trCount
 }
 
+/***
+ * Retrieves the Location Indicators codes (ICAO codes) in a map.
+ * The map key is the ICAO code while the value is the location name.
+ * Use the information provided in the GEN AIP.
+ * For Japan, somes ICAO codes are not airport or heliport. They are associated to NOTAMs.
+ * These codes are identified by an asterix (*). The asterix is removed and the code is recorded.
+ ***/
+func (aipdcs *JpAipDocument) LoadLocationIndicators(cl *http.Client) *map[string]string {
+	var indexUrl = aipdcs.FullURLDir + JapanAis.LocationCodePage
+	fmt.Println("   Retrieve Location indicatores from: " + indexUrl)
+	resp, err := cl.Get(indexUrl)
+	defer resp.Body.Close()
+
+	if err != nil {
+		fmt.Println("Problem while reading %s \n", indexUrl)
+		log.Fatal(err)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		fmt.Println("No url found for airports extraction")
+		log.Fatal(err)
+	}
+
+	locationCodes := make(map[string]string)
+
+	doc.Find(`td[class="colsep-1"]`).Find(`tr[id^="ICAO-"]`).Each(func(index int, divhtml *goquery.Selection) {
+		var tds = divhtml.ChildrenFiltered(`td`)
+		var location = tds.Eq(0).Text()
+		var code = tds.Eq(1).Text()
+
+		if location != "" && code != "" && len(code)>=4 {
+			locationCodes[code[0:4]] = location
+		}
+	})
+
+	return &locationCodes
+}
+
 func (aipdcs *JpAipDocument) LoadAirports(cl *http.Client) {
 	var indexUrl = aipdcs.FullURLDir + JapanAis.AipIndexPageName
 
@@ -150,7 +189,7 @@ func (aipDoc *JpAipDocument) retrieveAirport(wg *sync.WaitGroup, h3html *goquery
 				if idEx {
 					ad := JpAirport{}
 					ad.AipDocument = aipDoc
-					
+
 					ad.Icao = idId[5:9]
 					ad.Title = ahtml.Text()[7:]
 					href, hrefEx := ahtml.Attr("href")

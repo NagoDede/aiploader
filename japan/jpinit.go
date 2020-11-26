@@ -31,6 +31,7 @@ type JpData struct {
 	LoginData            JpLoginFormData `json:"loginData"`
 	LoginPage            string          `json:"loginPage"`
 	AipIndexPageName     string
+	LocationCodePage	 string
 	NextEffectiveDateStr string    `json:"nextDate"`
 	NextEffectiveDate    time.Time `json:"-"`
 }
@@ -135,6 +136,18 @@ func (jpd *JpData) Process() {
 
 		fmt.Println("Retrieve the Navaids List")
 		activeAipDoc.GetNavaids(&client)
+
+		fmt.Println("Retrieve the Location Codes")
+		locationCodes := activeAipDoc.LoadLocationIndicators(&client)
+
+		jsonLocationCodes, err := json.Marshal(locationCodes)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		var codeLocationPath = filepath.Join(activeAipDoc.DirMergeFiles(), "codes.json")
+		_ = ioutil.WriteFile(codeLocationPath, jsonLocationCodes, 0644)
 
 		fmt.Println("Retrieve the Airports List")
 		activeAipDoc.LoadAirports(&client)
