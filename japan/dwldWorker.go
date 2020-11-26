@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-	"github.com/NagoDede/aiploader/generic"
 
+	"github.com/NagoDede/aiploader/generic"
 )
 
 // Here's the worker, of which we'll run several
@@ -98,7 +98,7 @@ func DownloadAndMergeAiportData(apt *generic.Airport, jobs *chan *generic.PdfDat
 			fmt.Printf("     Airport: %s merging files (%d). \n", apt.Icao, len(apt.PdfData))
 			err := MergePdfDataOfAiport(apt)
 			if err != nil {
-				fmt.Println("     Problem on Airport: %s download again \n", apt.Icao)
+				fmt.Printf("     Problem on Airport: %s download again \n", apt.Icao)
 				DownloadAndMergeAiportData(apt, jobs, docWg, true)
 			} else {
 				//All the airport downloads and merge have been done. The airport can be remove of the waiting group
