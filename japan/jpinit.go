@@ -148,6 +148,7 @@ func (jpd *JpData) Process() {
 
 		var codeLocationPath = filepath.Join(activeAipDoc.DirMergeFiles(), "codes.json")
 		_ = ioutil.WriteFile(codeLocationPath, jsonLocationCodes, 0644)
+		fmt.Printf("Save location codes %s \n", codeLocationPath)
 
 		fmt.Println("Retrieve the Airports List")
 		activeAipDoc.LoadAirports(&client)
