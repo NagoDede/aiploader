@@ -32,7 +32,7 @@ jobs:
       run: |
         git config --local user.email "nagodede@github.com"
         git config --local user.name "GitHub Action"
-        git add .
+        git add --all 
         git commit --allow-empty -m "Update AIPs" -a
         
     - name: Push changes
@@ -46,10 +46,11 @@ jobs:
       with:
           personal_token: ${{ secrets.TOKEN }}
           external_repository: NagoDede/fly-out.fr
-          destination_dir: ./content/english//aip/japan/documents
+          destination_dir: ./content/english/aip/japan/documents
           publish_dir: //tmp/AipPages/Japan/merge
           #   keep_files: true
           user_name: NagoDede
           user_email: nagoydede@yahoo.com
           publish_branch: master
         #   cname: example.com
+
