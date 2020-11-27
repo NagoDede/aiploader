@@ -84,7 +84,7 @@ func (jpd *JpData) LoadJsonFile(path string) {
 			log.Fatal(err)
 		}
 	}
-	fmt.Printf("Expect Next Active Document: %s", jpd.NextEffectiveDate.Format("02-Jan-2006"))
+	fmt.Printf("Expect Next Active Document: %s \n", jpd.NextEffectiveDate.Format("02-Jan-2006"))
 
 	//The password may be provided by an environment variable
 	if strings.HasPrefix(jpd.LoginData.PasswordIn, "Env:") {
@@ -134,21 +134,11 @@ func (jpd *JpData) Process() {
 			" Publication Date: " + activeAipDoc.PublicationDate.Format("02-Jan-2006"))
 		fmt.Println("   " + activeAipDoc.FullURLDir)
 
+		retrieveLocationCodes(&client, activeAipDoc)
+		
+
 		fmt.Println("Retrieve the Navaids List")
 		activeAipDoc.GetNavaids(&client)
-
-		fmt.Println("Retrieve the Location Codes")
-		locationCodes := activeAipDoc.LoadLocationIndicators(&client)
-
-		jsonLocationCodes, err := json.Marshal(locationCodes)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		var codeLocationPath = filepath.Join(activeAipDoc.DirMergeFiles(), "codes.json")
-		_ = ioutil.WriteFile(codeLocationPath, jsonLocationCodes, 0644)
-		fmt.Printf("Save location codes %s \n", codeLocationPath)
 
 		fmt.Println("Retrieve the Airports List")
 		activeAipDoc.LoadAirports(&client)
@@ -162,10 +152,15 @@ func (jpd *JpData) Process() {
 		jsonData, err := json.MarshalIndent(activeAipDoc, "", " ")
 		if err != nil {
 			log.Println(err)
+			panic(err)
 		}
 
 		var infoPath = filepath.Join(activeAipDoc.DirMergeFiles(), "info.json")
-		_ = ioutil.WriteFile(infoPath, jsonData, 0644)
+		err = ioutil.WriteFile(infoPath, jsonData, 0644)
+		if err != nil {
+			log.Println(err)
+			panic(err)
+		}
 		fmt.Printf("Save Airport Information file %s \n", infoPath)
 
 
@@ -183,6 +178,21 @@ func (jpd *JpData) Process() {
 		fmt.Printf("No need to run. Current date %s - next date %s", today.Format("02-Jan-2006"), jpd.NextEffectiveDate.Format("02-Jan-2006"))
 	}
 }
+
+func retrieveLocationCodes(client *http.Client, activeAipDoc *JpAipDocument) {
+	fmt.Println("Retrieve the Location Codes")
+	locationCodes := activeAipDoc.LoadLocationIndicators(client)
+	jsonLocationCodes, err := json.Marshal(locationCodes)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var codeLocationPath = filepath.Join(activeAipDoc.DirMergeFiles(), "codes.json")
+	_ = ioutil.WriteFile(codeLocationPath, jsonLocationCodes, 0644)
+	fmt.Printf("Save location codes %s \n", codeLocationPath)
+}
+
 
 /**
  * initClient inits an http client to connect to the website  by sending the
