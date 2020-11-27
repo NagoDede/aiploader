@@ -166,6 +166,8 @@ func (jpd *JpData) Process() {
 
 		var infoPath = filepath.Join(activeAipDoc.DirMergeFiles(), "info.json")
 		_ = ioutil.WriteFile(infoPath, jsonData, 0644)
+		fmt.Printf("Save Airport Information file %s \n", infoPath)
+
 
 		//save the next date in the json file
 		jpd.NextEffectiveDate = activeAipDoc.NextEffectiveDate
