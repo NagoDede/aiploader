@@ -136,7 +136,6 @@ func (jpd *JpData) Process() {
 
 		retrieveLocationCodes(&client, activeAipDoc)
 		
-
 		fmt.Println("Retrieve the Navaids List")
 		activeAipDoc.GetNavaids(&client)
 

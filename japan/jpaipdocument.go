@@ -119,7 +119,7 @@ func (aipdcs *JpAipDocument) LoadLocationIndicators(cl *http.Client) *map[string
 	defer resp.Body.Close()
 
 	if err != nil {
-		fmt.Println("Problem while reading %s \n", indexUrl)
+		fmt.Printf("Problem while reading %s \n", indexUrl)
 		log.Fatal(err)
 	}
 
@@ -137,7 +137,7 @@ func (aipdcs *JpAipDocument) LoadLocationIndicators(cl *http.Client) *map[string
 		var code = tds.Eq(1).Text()
 
 		if location != "" && code != "" && len(code)>=4 {
-			locationCodes[code[0:4]] = location
+			locationCodes[code[0:4]] = strings.Replace(location,"\n", " ",-1)
 		}
 	})
 
