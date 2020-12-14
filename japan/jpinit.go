@@ -31,7 +31,7 @@ type JpData struct {
 	LoginData            JpLoginFormData `json:"loginData"`
 	LoginPage            string          `json:"loginPage"`
 	AipIndexPageName     string
-	LocationCodePage	 string
+	LocationCodePage     string
 	NextEffectiveDateStr string    `json:"nextDate"`
 	NextEffectiveDate    time.Time `json:"-"`
 }
@@ -135,7 +135,7 @@ func (jpd *JpData) Process() {
 		fmt.Println("   " + activeAipDoc.FullURLDir)
 
 		retrieveLocationCodes(&client, activeAipDoc)
-		
+
 		fmt.Println("Retrieve the Navaids List")
 		activeAipDoc.GetNavaids(&client)
 
@@ -162,7 +162,6 @@ func (jpd *JpData) Process() {
 		}
 		fmt.Printf("Save Airport Information file %s \n", infoPath)
 
-
 		//save the next date in the json file
 		jpd.NextEffectiveDate = activeAipDoc.NextEffectiveDate
 		jpd.NextEffectiveDateStr = jpd.NextEffectiveDate.Format("02/01/2006")
@@ -188,10 +187,14 @@ func retrieveLocationCodes(client *http.Client, activeAipDoc *JpAipDocument) {
 	}
 
 	var codeLocationPath = filepath.Join(activeAipDoc.DirMergeFiles(), "codes.json")
-	_ = ioutil.WriteFile(codeLocationPath, jsonLocationCodes, 0644)
-	fmt.Printf("Save location codes %s \n", codeLocationPath)
-}
+	err = ioutil.WriteFile(codeLocationPath, jsonLocationCodes, 0644)
+	if err != nil {
+		fmt.Printf("Unable to Save location codes %s \n", codeLocationPath)
+	} else {
+		fmt.Printf("Save location codes %s \n", codeLocationPath)
 
+	}
+}
 
 /**
  * initClient inits an http client to connect to the website  by sending the
