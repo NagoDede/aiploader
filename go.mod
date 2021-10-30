@@ -1,6 +1,6 @@
 module github.com/NagoDede/aiploader
 
-go 1.15
+go 1.17
 
 require (
 	github.com/NagoDede/unipdf v1.1.1
