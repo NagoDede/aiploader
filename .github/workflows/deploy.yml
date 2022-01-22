@@ -48,7 +48,7 @@ jobs:
           external_repository: NagoDede/fly-out.fr
           destination_dir: ./content/english/aip/japan/documents
           publish_dir: //tmp/AipPages/Japan/merge
-          #   keep_files: true
+          keep_files: true
           user_name: NagoDede
           user_email: nagoydede@yahoo.com
           publish_branch: master
