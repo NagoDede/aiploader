@@ -6,44 +6,41 @@ on:
   - cron: "1 */12 * * *"
 
 jobs:
-
   build:
-    name: Build
+    name: Build and deploy
     runs-on: ubuntu-latest
     steps:
-   
-         
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.17
+     - name: Check out code
+       uses: actions/checkout@v4
+       
+     - name: Set up Go 1.x
+       uses: actions/setup-go@v5
+       with:
+         go-version: '1.27'
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-
-    - name: Execute
-      shell: bash
-      env:
+     - name: Execute
+       shell: bash
+       env:
          JAPAN_AIP_PWD: ${{ secrets.JAPAN_AIP_PWD }}
          JAPAN_AIP_USERID: ${{secrets.JAPAN_AIP_USERID }}
-      run: ./aiploader
+       run: ./aiploader
       
-    - name: Commit files
-      run: |
-        git config --local user.email "nagodede@github.com"
-        git config --local user.name "GitHub Action"
-        git add --all 
-        git commit --allow-empty -m "Update AIPs" -a
+     - name: Commit files
+       run: |
+         git config --local user.email "nagodede@github.com"
+         git config --local user.name "GitHub Action"
+         git add --all 
+         git commit --allow-empty -m "Update AIPs" -a
         
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+     - name: Push changes
+       uses: ad-m/github-push-action@master
+       with:
+         github_token: ${{ secrets.GITHUB_TOKEN }}
+         branch: ${{ github.ref }}
 
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
+     - name: Deploy
+       uses: peaceiris/actions-gh-pages@v3
+       with:
           personal_token: ${{ secrets.TOKEN }}
           external_repository: NagoDede/fly-out.fr
           destination_dir: ./content/english/aip/japan/documents
